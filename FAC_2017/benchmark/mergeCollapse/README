@@ -1,0 +1,46 @@
+This folder contains the example mergeCollapse.c that partially models the 
+the Timsort algorithm described by Gouw et al. [CAV 15].
+
+==========================
+Using Frama-C/WP and StaDy
+==========================
+
+Use the following commands (to be run in a terminal) in the folder mergeCollapse/:
+
+- Set an environment variable with example file (to avoid typing it each time):
+
+	export MYFILE=mergeCollapse.c
+
+- Run Frama-C/WP to prove the auxiliary function:
+
+	frama-c $MYFILE -wp -wp-prover alt-ergo,cvc3 -wp-fct mergeAt
+
+  All properties are proved.
+
+- Run Frama-C/WP to try to prove the main function:
+
+	frama-c $MYFILE -wp -wp-prover alt-ergo,cvc3 -wp-fct mergeCollapse -wp-timeout 9000
+
+  Only proofs of postconditions e2 and e3 fail.
+  Warning: the proof within a virtual machine may require a large timeout, due to resource limitations.
+
+- Run Frama-C/WP to prove the corrected function:
+
+	frama-c $MYFILE -wp -wp-prover alt-ergo,cvc3 -wp-fct newMergeCollapse -wp-timeout 180
+
+  All properties are proved.
+
+- Run StaDy for non-compliance detection in the bugged function:
+
+	frama-c $MYFILE -main mergeCollapse -stady -stady-timeout 9000 -stady-stop-when-assert-violated
+
+  A counterexample is generated.
+
+==================
+Disclaimer
+==================
+
+Due to a non-deterministic nature of test generation in PathCrawler, and different 
+performances of the virtual machine on another host, the obtained results can be slightly 
+different from those observed by the authors.
+
